@@ -199,6 +199,9 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 .tag.done-tag { transition: background .2s ease, color .2s ease; }
 .tag.done-tag.on { background: var(--c-accent); color: #fff; }
 .tag.done-tag.on svg path { stroke: #fff; }
+.tag.done-tag .t { display: none; }
+.tag.done-tag:not(.on) { min-width: 30px; padding: 0; justify-content: center; }
+.tag.done-tag.on .t { display: inline; }
 
 .steps { display: flex; flex-direction: column; }
 .step { position: relative; height: 361px; border-radius: var(--r-card); overflow: hidden; background: var(--c-surface); }
