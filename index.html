@@ -202,6 +202,7 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 .tag.done-tag .t { display: none; }
 .tag.done-tag:not(.on) { min-width: 30px; padding: 0; justify-content: center; }
 .tag.done-tag.on .t { display: inline; }
+.ic.loading, .btn.loading { opacity: .5; pointer-events: none; }
 
 .steps { display: flex; flex-direction: column; }
 .step { position: relative; height: 361px; border-radius: var(--r-card); overflow: hidden; background: var(--c-surface); }
@@ -619,6 +620,7 @@ body.zooming { overflow: hidden; }
     cap.innerHTML = '<span class="t zoom-name">' + (name ? esc(name.textContent) : "") + '<i class="bl" style="display:inline-block;width:0;height:0;vertical-align:baseline"></i></span>' + (age ? age.outerHTML : "") ;
     var btns = document.createElement("div"); btns.className = "zoom-btns";
     var tracked = card.hasAttribute("data-key");
+    btns.__card = card;
     btns.innerHTML = '<button class="ic" type="button" aria-label="Скачать">' + ICON.download() + '</button><button class="ic" type="button" aria-label="Распечатать">' + ICON.print() + '</button>' +
       (tracked ? '<button class="zoom-done" type="button"><svg width="14" height="11" viewBox="0 0 18 14" fill="none" aria-hidden="true"><path d="M2 7.5L6.5 12L16 2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="t">Сделано</span></button>' : '');
     var zdone = btns.querySelector(".zoom-done");
@@ -685,6 +687,130 @@ body.zooming { overflow: hidden; }
     openZoom(card);
   });
   window.addEventListener("hashchange", function () { if (zoom) zoom.shut(); });
+
+  // ---------- Скачивание и печать ----------
+  // Свои файлы для печати: FILES["card-coloring-f9055280"] = "files/Персонажи.pdf" — тогда кнопки отдают их.
+  var FILES = {};
+  function baseOf(src) { var m = (src || "").match(/([^\/]+)\.webp$/); return m ? m[1] : ""; }
+  function bigSrc(src) { return /img\/card-/.test(src) ? src.replace("img/", "img/lg/") : src; }
+  function safeName(s) { return (s || "WB Дети").replace(/[\\\/:*?"<>|]+/g, " ").trim(); }
+  function capText(s) { return (s || "").replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim(); }
+
+  // Что привязано к кнопке: список листов {src, name, cap}
+  function origamiSheets(key) {
+    var d = ORIGAMI[key], SI = IMG.steps[key] || [], n = d.steps.length, out = [];
+    out.push({ src: SI[0], cap: d.title + " · " + n + " " + plural(n) });
+    d.steps.forEach(function (c, i) { out.push({ src: SI[i + 1], cap: (i + 1) + " шаг" + (c ? " — " + capText(c) : "") }); });
+    out.push({ src: SI[n + 1], cap: "Готово!" });
+    return { title: d.title, steps: out.filter(function (s) { return s.src; }) };
+  }
+  function cardJob(card) {
+    var href = card.getAttribute("href") || "";
+    var k = href.charAt(0) === "#" ? href.slice(1) : "";
+    if (ORIGAMI[k]) return { origami: origamiSheets(k) };
+    var pic = card.querySelector(".pic"), nm = card.querySelector(".meta .t-16");
+    var src = pic && pic.getAttribute("src");
+    return src ? { title: nm ? nm.textContent : "", pages: [{ src: bigSrc(src), base: baseOf(src) }] } : null;
+  }
+  function jobFor(btn) {
+    var card = btn.closest(".card") || (btn.closest(".zoom-btns") || {}).__card;
+    if (card) return cardJob(card);
+    var key = (location.hash || "").slice(1);
+    if (btn.closest(".title-row") && ORIGAMI[key]) return { origami: origamiSheets(key) };
+    if (btn.closest(".actions")) {
+      var c = catById(key), pages = [];
+      app.querySelectorAll(".masonry .card").forEach(function (el) { var j = cardJob(el); if (j && j.pages) pages = pages.concat(j.pages); });
+      return pages.length ? { title: (c ? c.name : "WB Дети") + " — все", pages: pages } : null;
+    }
+    return null;
+  }
+
+  function loadImg(src) { return new Promise(function (ok, no) { var i = new Image(); i.onload = function () { ok(i); }; i.onerror = no; i.src = src; }); }
+  function loadScript(src) { return new Promise(function (ok, no) { var s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+  var pdfLib = null;
+  function getPdf() { return pdfLib || (pdfLib = loadScript("js/jspdf.umd.min.js").then(function () { return window.jspdf.jsPDF; })); }
+
+  // Лист шага оригами: картинка + подпись под ней (подпись рисуем сами — так кириллица точно на месте)
+  function stepCanvas(im, cap) {
+    var W = 720, pad = 18, fs = 34, ctx0 = document.createElement("canvas").getContext("2d");
+    ctx0.font = fs + "px 'WB Sans', Onest, sans-serif";
+    var words = cap.split(" "), lines = [], line = "";
+    words.forEach(function (w) { var t = line ? line + " " + w : w; if (ctx0.measureText(t).width > W - pad * 2 && line) { lines.push(line); line = w; } else line = t; });
+    if (line) lines.push(line);
+    var ih = Math.round(im.naturalHeight * W / im.naturalWidth), H = ih + pad + lines.length * (fs + 8) + pad;
+    var cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    var g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, W, H); g.drawImage(im, 0, 0, W, ih);
+    g.fillStyle = "#000"; g.font = ctx0.font; g.textAlign = "center"; g.textBaseline = "top";
+    lines.forEach(function (l, i) { g.fillText(l, W / 2, ih + pad + i * (fs + 8)); });
+    return cv;
+  }
+  function flat(im) { var cv = document.createElement("canvas"); cv.width = im.naturalWidth; cv.height = im.naturalHeight; var g = cv.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(im, 0, 0); return cv; }
+
+  // PDF A4: картинка по центру листа с полями 10 мм; оригами — сетка 3×4 шагов с подписями
+  function buildPdf(job) {
+    return getPdf().then(function (jsPDF) {
+      var doc = new jsPDF({ unit: "mm", format: "a4" }), PW = 210, PH = 297, M = 10;
+      function put(cv, x, y, w, h) {
+        var r = Math.min(w / cv.width, h / cv.height), dw = cv.width * r, dh = cv.height * r;
+        doc.addImage(cv.toDataURL("image/jpeg", 0.92), "JPEG", x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+      }
+      if (job.origami) {
+        return Promise.all(job.origami.steps.map(function (s) { return loadImg(s.src).then(function (im) { return stepCanvas(im, s.cap); }); })).then(function (cvs) {
+          var cols = 3, rows = 4, gw = (PW - M * 2) / cols, gh = (PH - M * 2) / rows;
+          cvs.forEach(function (cv, i) {
+            var p = i % (cols * rows); if (i && !p) doc.addPage();
+            put(cv, M + (p % cols) * gw + 2, M + Math.floor(p / cols) * gh + 2, gw - 4, gh - 4);
+          });
+          return { doc: doc, name: job.origami.title };
+        });
+      }
+      return Promise.all(job.pages.map(function (p) { return loadImg(p.src).then(flat); })).then(function (cvs) {
+        cvs.forEach(function (cv, i) { if (i) doc.addPage(); put(cv, M, M, PW - M * 2, PH - M * 2); });
+        return { doc: doc, name: job.title };
+      });
+    });
+  }
+
+  function saveBlob(blob, name) {
+    var a = document.createElement("a"), u = URL.createObjectURL(blob);
+    a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(u); }, 30000);
+  }
+  function own(job) { return job && job.pages && job.pages.length === 1 && FILES[job.pages[0].base]; }
+
+  function doDownload(job) {
+    var f = own(job);
+    if (f) { var a = document.createElement("a"); a.href = f; a.download = f.split("/").pop(); document.body.appendChild(a); a.click(); a.remove(); return Promise.resolve(); }
+    return buildPdf(job).then(function (r) { saveBlob(r.doc.output("blob"), "WB Дети — " + safeName(r.name) + ".pdf"); });
+  }
+  function doPrint(job) {
+    var f = own(job);
+    if (f) { window.open(f, "_blank"); return Promise.resolve(); }
+    return buildPdf(job).then(function (r) {
+      var u = URL.createObjectURL(r.doc.output("blob"));
+      var fr = document.createElement("iframe"); fr.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
+      fr.src = u; document.body.appendChild(fr);
+      fr.onload = function () {
+        setTimeout(function () {
+          try { fr.contentWindow.focus(); fr.contentWindow.print(); }
+          catch (e) { window.open(u, "_blank"); } // телефоны: открываем PDF, печать оттуда
+        }, 300);
+      };
+      setTimeout(function () { fr.remove(); URL.revokeObjectURL(u); }, 120000);
+    });
+  }
+
+  var busy = false;
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest('.ic[aria-label="Скачать"], .ic[aria-label="Распечатать"], .actions .btn'); if (!b) return;
+    e.preventDefault();
+    var job = jobFor(b); if (!job || busy) return;
+    var isPrint = /Распечатать/.test(b.getAttribute("aria-label") || "");
+    busy = true; b.classList.add("loading");
+    (isPrint ? doPrint(job) : doDownload(job))
+      .catch(function () { alert("Не получилось подготовить файл. Попробуйте ещё раз."); })
+      .then(function () { busy = false; b.classList.remove("loading"); });
+  }, true);
 
   window.addEventListener("hashchange", render);
   render();
