@@ -696,16 +696,7 @@ body.zooming { overflow: hidden; }
   // Готовые листы A4 для оригами (свёрстаны в Figma) — отдаём их вместо сборки PDF в браузере
   var ORIGAMI_PDF = { "origami-fox": "pdf/origami-fox.pdf", "origami-hedgehog": "pdf/origami-hedgehog.pdf", "origami-frog": "pdf/origami-frog.pdf", "origami-hare": "pdf/origami-hare.pdf", "origami-crane": "pdf/origami-crane.pdf" };
   var ORIGAMI_ALL = "pdf/origami-all.pdf";
-  // Сделано ли оригами (те же отметки, что у тега и карточек раздела): тогда в PDF тег «Сделано» обведён от руки
-  function origamiDone(key) {
-    return false; // отметки «Сделано» убраны с сайта
-    var items = catById("origami").items, list = null;
-    try { list = JSON.parse(localStorage.getItem("wbkids-done2-origami") || "null"); } catch (e) {}
-    if (!list) list = ["0:" + items[0][0]];
-    for (var i = 0; i < items.length; i++) if (items[i][2] === key) return list.indexOf(i + ":" + items[i][0]) > -1;
-    return false;
-  }
-  function origamiPdf(key) { return ORIGAMI_PDF[key] ? ORIGAMI_PDF[key].replace(".pdf", origamiDone(key) ? "-done.pdf" : ".pdf") : null; }
+  function origamiPdf(key) { return ORIGAMI_PDF[key] || null; }
   // «Скачать все»: склеиваем листы (каждый — в своём состоянии) через pdf-lib
   var pdfLibMerge = null;
   function getPdfLib() { return pdfLibMerge || (pdfLibMerge = loadScript("js/pdf-lib.min.js").then(function () { return window.PDFLib; })); }
