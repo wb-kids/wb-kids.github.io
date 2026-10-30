@@ -125,7 +125,7 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 
 /* ============ Категория ============ */
 .desc { margin: 0; font-size: 40px; line-height: .9; overflow-wrap: break-word; }
-.desc u { text-decoration: underline; text-decoration-color: var(--c-accent); text-decoration-thickness: 4px; text-underline-offset: 4px; text-decoration-skip-ink: none; }
+.desc u { text-decoration: underline; text-decoration-color: var(--c-ink); text-decoration-thickness: 4px; text-underline-offset: 4px; text-decoration-skip-ink: none; }
 
 .masonry { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; align-items: start; }
 .masonry .col { display: flex; flex-direction: column; gap: 14px; }
@@ -269,7 +269,7 @@ body.zooming { overflow: hidden; }
   // ---------- Иконки ----------
   // SVG экспортированы из Figma 1-в-1
   var ICON = {
-    pill: '<svg class="wb-pill" width="52" height="31" viewBox="0 0 52 31" fill="none" aria-hidden="true"><path d="M0 15.34C0 6.86795 6.86868 0 15.3416 0H36.6584C45.1313 0 52 6.86795 52 15.34C52 23.812 45.1313 30.68 36.6584 30.68H15.3416C6.86868 30.68 0 23.812 0 15.34Z" fill="#FF00FF"/><path d="M11.6486 23.6477L6.10498 9.08513H9.82005L13.0998 17.5023L16.3504 9.08513H18.5853L21.894 17.5606L25.1737 9.08513H28.7147L23.1711 23.6477H20.8201L17.4243 14.9102L13.9995 23.6477H11.6486Z" fill="#F0F0F0"/><path d="M29.7323 15.6674V2.74097H33.2152V10.6579C34.5793 9.34725 36.3788 8.67737 38.1783 8.67737C41.7482 8.67737 45.3472 11.2404 45.3472 16.3664C45.3472 20.8808 42.0385 24.0555 37.4817 24.0555C32.925 24.0555 29.7323 20.8808 29.7323 15.6674ZM33.2152 16.3664C33.2152 18.8421 34.9566 20.5896 37.4817 20.5896C40.0068 20.5896 41.7482 18.8421 41.7482 16.3664C41.7482 13.8908 40.0068 12.1433 37.4817 12.1433C34.9566 12.1433 33.2152 13.8908 33.2152 16.3664Z" fill="#F0F0F0"/></svg>',
+    pill: '<svg class="wb-pill" width="52" height="31" viewBox="0 0 52 31" fill="none" aria-hidden="true"><path d="M0 15.34C0 6.86795 6.86868 0 15.3416 0H36.6584C45.1313 0 52 6.86795 52 15.34C52 23.812 45.1313 30.68 36.6584 30.68H15.3416C6.86868 30.68 0 23.812 0 15.34Z" fill="#FF00FF"/><path d="M11.6486 23.6477L6.10498 9.08513H9.82005L13.0998 17.5023L16.3504 9.08513H18.5853L21.894 17.5606L25.1737 9.08513H28.7147L23.1711 23.6477H20.8201L17.4243 14.9102L13.9995 23.6477H11.6486Z" fill="#FFFFFF"/><path d="M29.7323 15.6674V2.74097H33.2152V10.6579C34.5793 9.34725 36.3788 8.67737 38.1783 8.67737C41.7482 8.67737 45.3472 11.2404 45.3472 16.3664C45.3472 20.8808 42.0385 24.0555 37.4817 24.0555C32.925 24.0555 29.7323 20.8808 29.7323 15.6674ZM33.2152 16.3664C33.2152 18.8421 34.9566 20.5896 37.4817 20.5896C40.0068 20.5896 41.7482 18.8421 41.7482 16.3664C41.7482 13.8908 40.0068 12.1433 37.4817 12.1433C34.9566 12.1433 33.2152 13.8908 33.2152 16.3664Z" fill="#FFFFFF"/></svg>',
     download: function () { return '<svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true"><rect width="36" height="36" rx="18" fill="#FF00FF"/><path d="M18.0002 8.25L18 27.75M12 21.75L18 27.75L24 21.75" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'; },
     print: function () { return '<svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true"><rect width="36" height="36" rx="18" fill="#FF00FF"/><path d="M22.2222 24.4103V28H13.7778V24.4103M22.2222 24.4103V20.8205H13.7778V24.4103M22.2222 24.4103H27.5V14.1538H23.2778M23.2778 14.1538V11.0769L20.6389 8H12.7222V14.1538M23.2778 14.1538H12.7222M13.7778 24.4103H8.5V14.1538H12.7222" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'; },
     dlSmall: '<svg width="10" height="15" viewBox="0 0 10 15" fill="none" aria-hidden="true"><path d="M9.70711 10.7071L5.70711 14.7071C5.31658 15.0976 4.68342 15.0976 4.29289 14.7071L0.292893 10.7071C-0.0976311 10.3166 -0.0976311 9.68342 0.292893 9.29289C0.683417 8.90237 1.31658 8.90237 1.70711 9.29289L4 11.5858V1C4 0.447715 4.44772 0 5 0C5.55228 0 6 0.447715 6 1V11.5858L8.29289 9.29289C8.68342 8.90237 9.31658 8.90237 9.70711 9.29289C10.0976 9.68342 10.0976 10.3166 9.70711 10.7071Z" fill="#FF00FF"/></svg>',
@@ -387,19 +387,19 @@ body.zooming { overflow: hidden; }
     var tiles = CATS.slice(2).map(function (c) {
       var t = IMG.home[c.id] || { i: [] }, d = t.d ? 'darken' : '';
       return '<a class="tile" href="#' + c.id + '"><div class="art">' + ph(t.i[0], 'cover', d, 'big') + '<div class="div-v"></div><div class="col">' + ph(t.i[1], 'cover', d) + '<div class="div-h"></div>' + ph(t.i[2], 'cover', d) + '</div></div>' +
-        '<div class="label"><span class="t t-16">' + esc(c.name) + '</span><span class="t t-12 accent">' + esc(c.count) + "</span></div></a>";
+        '<div class="label"><span class="t t-16">' + esc(c.name) + '</span><span class="t t-12">' + esc(c.count) + "</span></div></a>";
     }).join("");
     var o = catById("origami");
     return header(false) + '<div class="stack gap-20">' + menu("home") +
       '<div class="stack gap-20">' +
         '<a class="stack gap-4" href="#origami"><div class="hero">' + ph(IMG.home.hero[0], 'cover', '', 'main') + '<div class="side">' + ph(IMG.home.hero[1]) + ph(IMG.home.hero[2]) + '</div></div>' +
-        '<div class="row-title"><span class="t t-40">' + o.name + '</span><span class="t t-20 accent">' + o.count + "</span></div></a>" +
+        '<div class="row-title"><span class="t t-40">' + o.name + '</span><span class="t t-20">' + o.count + "</span></div></a>" +
         '<div class="tiles">' + tiles + "</div>" +
       "</div></div>";
   }
 
   function intro(c) {
-    return '<div class="intro"><div class="row-title"><h1 class="t t-52" style="margin:0;font-weight:400">' + esc(c.name) + '</h1><span class="t t-20 accent">' + esc(c.count) + '</span></div>' + actions(total(c)) +
+    return '<div class="intro"><div class="row-title"><h1 class="t t-52" style="margin:0;font-weight:400">' + esc(c.name) + '</h1><span class="t t-20">' + esc(c.count) + '</span></div>' + actions(total(c)) +
       '<p class="desc">' + richDesc(c.desc) + "</p></div>";
   }
 
