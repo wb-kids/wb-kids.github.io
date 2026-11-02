@@ -782,7 +782,8 @@ body.zooming { overflow: hidden; }
 
   // ---------- Скачивание и печать ----------
   // Свои файлы для печати: FILES["card-coloring-f9055280"] = "files/Персонажи.pdf" — тогда кнопки отдают их.
-  var FILES = {};
+  // Раскраски: готовые листы A4 из Figma («Раскраска A4 / …»)
+  var FILES = { "card-coloring-f9055280": "pdf/coloring-f9055280.pdf", "card-coloring-a7fd75f6": "pdf/coloring-a7fd75f6.pdf", "card-coloring-58f2ece1": "pdf/coloring-58f2ece1.pdf", "card-coloring-287963c7": "pdf/coloring-287963c7.pdf", "card-coloring-f885f68d": "pdf/coloring-f885f68d.pdf", "card-coloring-7855a99d": "pdf/coloring-7855a99d.pdf", "card-coloring-91a46f5b": "pdf/coloring-91a46f5b.pdf", "card-coloring-36ddd7d3": "pdf/coloring-36ddd7d3.pdf", "card-coloring-79bf0d03": "pdf/coloring-79bf0d03.pdf", "card-coloring-25144b3e": "pdf/coloring-25144b3e.pdf", "card-coloring-a28593a9": "pdf/coloring-a28593a9.pdf", "card-coloring-b92e3c3a": "pdf/coloring-b92e3c3a.pdf", "card-coloring-8b86a111": "pdf/coloring-8b86a111.pdf", "card-coloring-f6e54d80": "pdf/coloring-f6e54d80.pdf", "card-coloring-c966a077": "pdf/coloring-c966a077.pdf" };
   // Готовые листы A4 для оригами (свёрстаны в Figma) — отдаём их вместо сборки PDF в браузере
   var ORIGAMI_PDF = { "origami-fox": "pdf/origami-fox.pdf", "origami-hedgehog": "pdf/origami-hedgehog.pdf", "origami-frog": "pdf/origami-frog.pdf", "origami-hare": "pdf/origami-hare.pdf", "origami-crane": "pdf/origami-crane.pdf" };
   var ORIGAMI_ALL = "pdf/origami-all.pdf";
@@ -790,10 +791,9 @@ body.zooming { overflow: hidden; }
   // «Скачать все»: склеиваем листы (каждый — в своём состоянии) через pdf-lib
   var pdfLibMerge = null;
   function getPdfLib() { return pdfLibMerge || (pdfLibMerge = loadScript("js/pdf-lib.min.js").then(function () { return window.PDFLib; })); }
-  function mergeOrigami() {
-    var keys = catById("origami").items.map(function (it) { return it[2]; }).filter(function (k) { return ORIGAMI_PDF[k]; });
+  function mergeUrls(urls) {
     return getPdfLib().then(function (L) {
-      return Promise.all(keys.map(function (k) { return fetch(origamiPdf(k)).then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); }); })).then(function (bufs) {
+      return Promise.all(urls.map(function (u) { return fetch(u).then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); }); })).then(function (bufs) {
         return L.PDFDocument.create().then(function (out) {
           return bufs.reduce(function (p, b) {
             return p.then(function () { return L.PDFDocument.load(b).then(function (d) { return out.copyPages(d, d.getPageIndices()).then(function (pg) { pg.forEach(function (x) { out.addPage(x); }); }); }); });
@@ -801,6 +801,16 @@ body.zooming { overflow: hidden; }
         });
       }).then(function (bytes) { return new Blob([bytes], { type: "application/pdf" }); });
     });
+  }
+  function mergeOrigami() {
+    var keys = catById("origami").items.map(function (it) { return it[2]; }).filter(function (k) { return ORIGAMI_PDF[k]; });
+    return mergeUrls(keys.map(origamiPdf));
+  }
+  // Несколько листов, и у всех есть готовый PDF — склеиваем готовые файлы
+  function ownAll(job) {
+    if (!job || !job.pages || job.pages.length < 2) return null;
+    var fs = job.pages.map(function (p) { return FILES[p.base]; });
+    return fs.every(Boolean) ? fs : null;
   }
   function baseOf(src) { var m = (src || "").match(/([^\/]+)\.webp$/); return m ? m[1] : ""; }
   function bigSrc(src) { return /img\/card-/.test(src) ? src.replace("img/", "img/lg/") : src; }
@@ -897,6 +907,8 @@ body.zooming { overflow: hidden; }
 
   function doDownload(job) {
     if (job.allOrigami) return mergeOrigami().then(function (b) { saveBlob(b, "WB Дети — Оригами.pdf"); }, function () { var a = document.createElement("a"); a.href = ORIGAMI_ALL; a.download = "WB Дети — Оригами.pdf"; document.body.appendChild(a); a.click(); a.remove(); });
+    var fa = ownAll(job);
+    if (fa) return mergeUrls(fa).then(function (b) { saveBlob(b, "WB Дети — " + safeName(job.title) + ".pdf"); });
     var f = own(job);
     if (f) { var a = document.createElement("a"); a.href = f; a.download = fileName(job, f); document.body.appendChild(a); a.click(); a.remove(); return Promise.resolve(); }
     return buildPdf(job).then(function (r) { saveBlob(r.doc.output("blob"), "WB Дети — " + safeName(r.name) + ".pdf"); });
@@ -904,7 +916,8 @@ body.zooming { overflow: hidden; }
   function doPrint(job) {
     var f = own(job);
     if (f) { window.open(f, "_blank"); return Promise.resolve(); }
-    var made = job.allOrigami ? mergeOrigami().then(function (b) { return b; }, function () { window.open(ORIGAMI_ALL, "_blank"); throw "opened"; }) : buildPdf(job).then(function (r) { return r.doc.output("blob"); });
+    var fa = ownAll(job);
+    var made = fa ? mergeUrls(fa) : job.allOrigami ? mergeOrigami().then(function (b) { return b; }, function () { window.open(ORIGAMI_ALL, "_blank"); throw "opened"; }) : buildPdf(job).then(function (r) { return r.doc.output("blob"); });
     return made.then(function (blob) {
       var u = URL.createObjectURL(blob);
       var fr = document.createElement("iframe"); fr.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0";
