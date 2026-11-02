@@ -52,6 +52,9 @@ body {
   font-synthesis-weight: none; /* пока нет файла WB Sans Medium — не рисуем «фальшивый» жирный */
   -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
   overflow-x: clip; /* страница скроллится только вертикально */
+  /* В макете трекинг 0%, но встроенный файл WB Sans в браузере на ~4.5% уже, чем тот же шрифт в Figma
+     (замер: «Конструкторы» 20px — 130.8px против 137px). +0.025em выравнивает ширину слов с макетом. */
+  letter-spacing: 0.025em;
 }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -121,7 +124,8 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 .tile .art .col { flex: 0 0 58px; display: flex; flex-direction: column; }
 .tile .art .col .ph { flex: 1; }
 .tile .art .col .div-h { height: 2px; background: var(--c-bg); }
-.tile .label { display: flex; align-items: flex-end; gap: 8px; padding: 4px; }
+.tile .label { display: flex; align-items: baseline; gap: 8px; padding: 4px; } /* «N шт» — на первой строке названия */
+.tile .label > :last-child { white-space: nowrap; flex: none; }
 
 /* ============ Категория ============ */
 .desc { margin: 0; font-size: 40px; line-height: .9; overflow-wrap: break-word; }
@@ -158,12 +162,26 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 .intro { display: flex; flex-direction: column; }
 .intro .actions { margin-top: 20px; }
 .intro .desc { margin-top: 24px; }
+.intro .cat-hero { margin-top: 24px; }
+/* Разукраски: описание тем же шрифтом, что кнопки «Скачать все / Распечатать все» (16px, обычный) */
+/* Разукраски: описание — в левой колонке на месте бывшего трекера «Сделано»; высота по тексту, карточки ниже сдвигаются */
+.masonry-desc { flex: none; }
+/* кнопки → описание и правая колонка = 20px (было 32), обе колонки начинаются на одной высоте */
+.intro + .masonry:has(.masonry-desc) { margin-top: -12px; }
+.desc.desc-btn { margin: 0; font-size: 20px; font-weight: 500; line-height: .9; text-box: trim-both cap alphabetic; padding-bottom: 0; } /* без подчёркиваний запас под них не нужен: текст → карточка ровно 12px от базовой линии */ /* как пункты меню в шапке */
+.desc.desc-btn u { text-decoration-thickness: 2px; text-underline-offset: 3px; }
+/* Подчёркивания в описаниях убраны (разметка [слово] в текстах осталась — вернуть: удалить эту строку) */
+.desc u, .desc.desc-btn u { text-decoration: none; }
 .sec-head { display: flex; flex-direction: column; gap: 16px; }
 .btn {
   height: 30px; width: 100%; border-radius: var(--r-pill); background: var(--c-surface);
   display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px;
   color: var(--c-accent); font-size: 16px;
 }
+/* «Скачать все / Распечатать все»: заливка маджента, текст и иконки белые */
+.actions .btn { background: var(--c-accent); color: #fff; }
+.actions .btn svg path[fill="#FF00FF"] { fill: #fff; }
+.actions .btn svg path[stroke="#FF00FF"] { stroke: #fff; }
 .btn svg { flex: none; }
 
 .card { display: flex; flex-direction: column; gap: 4px; width: 100%; }
@@ -211,13 +229,17 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 .step .num { position: absolute; top: 24px; left: 24px; font-size: 20px; color: var(--c-accent); }
 .step .cap {
   position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); width: calc(100% - 28px);
-  text-align: center; font-family: var(--f-step); font-size: 16px; line-height: 18.93px; letter-spacing: -0.16px; color: var(--c-ink-soft);
+  text-align: center; font-family: var(--f-step); font-size: 16px; line-height: 18.93px; letter-spacing: 0; color: var(--c-ink-soft);
 }
 .step .done { position: absolute; left: 0; right: 0; bottom: 24px; text-align: center; font-size: 40px; font-weight: 500; color: var(--c-ink-soft); }
 .slide .cap {
   position: absolute; z-index: 1; left: 50%; bottom: 24px; transform: translateX(-50%); width: calc(100% - 20px);
-  text-align: center; font-family: var(--f-step); font-weight: 400; font-size: 18px; line-height: 18.93px; letter-spacing: -0.18px; color: var(--c-ink-soft);
+  text-align: center; font-family: var(--f-step); font-weight: 400; font-size: 18px; line-height: 18.93px; letter-spacing: 0; color: var(--c-ink-soft);
 }
+/* Первая карточка слайдера конструкторов — заголовок «Как подготовить материалы» */
+.slide-title .ph { top: 48px; bottom: 84px; overflow: visible; } /* картинка ниже индикатора, чуть наезжает на первую строку заголовка */
+.slide-title .ph .pic { object-fit: contain; transform: scale(1.4); transform-origin: 50% 60%; } /* на фото много белого поля — увеличиваем */
+.slide-title .title { z-index: 1; position: absolute; left: 24px; right: 24px; bottom: 24px; font-size: 40px; font-weight: 500; line-height: .9; color: var(--c-ink-soft); }
 .slide .done { position: absolute; z-index: 1; left: 0; right: 0; bottom: 24px; text-align: center; font-size: 40px; font-weight: 500; color: var(--c-ink-soft); }
 .row-title h1 { white-space: nowrap; }
 
@@ -237,7 +259,7 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 .zoom-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; max-width: none; }
 .zoom-cap, .zoom-btns { position: fixed; z-index: 52; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; align-items: center; opacity: 0; transform: translateY(8px); transition: opacity .3s ease .12s, transform .3s ease .12s; pointer-events: none; }
 .zoom-cap.on, .zoom-btns.on { opacity: 1; transform: none; }
-.zoom-cap { height: 30px; pointer-events: auto; padding: 0 16px; align-items: baseline; } /* текст в таблетке стоит на одной базовой линии с названием */
+.zoom-cap { height: 24px; pointer-events: auto; padding: 0 16px; align-items: baseline; } /* текст в таблетке стоит на одной базовой линии с названием */
 .zoom-cap .chip { align-self: auto; }
 .zoom-name { font-size: 24px; line-height: 1.1; color: var(--c-ink); white-space: nowrap; min-width: 0; }
 /* «Сделано» в просмотре — форма как у табов меню, цвета как у тега на карточке */
@@ -287,7 +309,8 @@ body.zooming { overflow: hidden; }
       items: [["Мир WB","6+"],["Персонажи","5+"],["Школа","6+"],["Пенал","5+"],["Мешок для сменки","5+"],["Твой гардероб","5+"],["Ягодка 1","4+"],["Ягодка 2","4+"],["Ягодка 3","4+"],["Ягодка 4","4+"],["Ягодка 5","4+"],["Ягодка 6","4+"],["Декор ПВЗ","5+"],["Декор цветы","4+"],["Пвз рядом","7+"]] },
     { id: "constructors", name: "Конструкторы", count: "3 шт", print: "Печать 3 шт",
       desc: "[Склей] 📎 распечатанный макет и картон, [вырежи] ✂️ [и собери] 3D-объект!",
-      prep: ["Скачайте pdf и распечатайте макет<br>на обычной бумаге", "Приклейте макет<br>на плотный картон", "Вырежи детали", "Собери все детали", "Приклейте детали друг к другу", "@done"],
+      // [подпись, номер картинки в IMG.prep]; «@title» — карточка-заголовок без картинки; шаг «Собери все детали» (картинка 3) убран
+      prep: [["@title", 3], ["Скачайте pdf и распечатайте макет<br>на обычной бумаге", 0], ["Приклейте макет<br>на плотный картон", 1], ["Вырежи детали", 2], ["Приклейте детали друг к другу", 4], ["@done", 5]],
       items: [["Котята","10+"],["Утка","10+"],["Медведь","13+"]] },
     { id: "characters", name: "Персонажи", count: "3 шт", print: "Печать 3 шт",
       desc: "[Собери] 🧩 персонажа [и придумай] 🌍 [мир] вокруг него!",
@@ -298,11 +321,11 @@ body.zooming { overflow: hidden; }
     { id: "games", name: "Игры на бумаге", count: "15 шт",
       desc: "Проходи 🌀 [лабиринты], 🔎 [находи отличия], [соединяй точки] и играй прямо на бумаге 📝!",
       sections: [
-        { title: "Лабиринты", print: "Печать 5 шт", items: [["Помоги девочке","7+"],["Найди замок","7+"],["Доставка","6+"],["Яйцо","9+"],["Доставка","10+"]] },
-        { title: "Найди предметы", print: "Печать 3 шт", items: [["Персонажи","7+"],["Дом дракона","6+"],["Дом дракона","6+"]] },
-        { title: "Соедини точки", print: "Печать 3 шт", items: [["Дракон","4+"],["Лиса","8+"],["Котик","8+"]] },
-        { title: "Найди отличия", print: "Печать 2 шт", items: [["Морские обитатели","6+"],["Песчаный замок","6+"]] },
-        { title: "Повтори симметрию", print: "Печать 2 шт", items: [["Мир ПВЗ","8+"],["Сон девочки","6+"]] }
+        { title: "Лабиринты", print: "Печать 5 шт", desc: "[Найди дорогу] 🧭 от старта до финиша и [не заблудись]!", items: [["Помоги девочке","7+"],["Найди замок","7+"],["Доставка","6+"],["Яйцо","9+"],["Доставка","10+"]] },
+        { title: "Найди предметы", print: "Печать 3 шт", desc: "Рассмотри 🔍 картинку и [отыщи все спрятанные предметы]!", items: [["Персонажи","7+"],["Дом дракона","6+"],["Дом дракона","6+"]] },
+        { title: "Соедини точки", print: "Печать 3 шт", desc: "[Соедини точки] ✏️ по порядку и [узнай], кто спрятался!", items: [["Дракон","4+"],["Лиса","8+"],["Котик","8+"]] },
+        { title: "Найди отличия", print: "Печать 2 шт", desc: "Сравни 👀 две картинки и [найди все отличия]!", items: [["Морские обитатели","6+"],["Песчаный замок","6+"]] },
+        { title: "Повтори симметрию", print: "Печать 2 шт", desc: "[Дорисуй] 🪞 вторую половину, чтобы получилось [одинаково]!", items: [["Мир ПВЗ","8+"],["Сон девочки","6+"]] }
       ] },
     { id: "masks", name: "Маски", count: "10 шт", print: "Печать 10 шт",
       desc: "Выбирай 🎭 маску, распечатывай 🖨️ и [превращайся в кого захочешь!] Примеряй разных 🐯 персонажей и [придумывай] 🎲 [свои игры]",
@@ -338,7 +361,9 @@ body.zooming { overflow: hidden; }
 
   function catById(id) { for (var i = 0; i < CATS.length; i++) if (CATS[i].id === id) return CATS[i]; return null; }
   function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-  function richDesc(s) { return esc(s).replace(/\[([^\]]+)\]/g, "<u>$1</u>"); }
+  // Короткие предлоги и союзы (1–2 буквы: и, в, на, по…) приклеиваем к следующему слову — они всегда переносятся вместе с ним
+  function nbspPreps(h) { var re = /(^|[\s>«( ])([а-яёА-ЯЁ]{1,2}) /g; return h.replace(re, "$1$2 ").replace(re, "$1$2 "); }
+  function richDesc(s) { return nbspPreps(esc(s).replace(/\[([^\]]+)\]/g, "<u>$1</u>")); }
   function plural(n) { var m10 = n % 10, m100 = n % 100; if (m10 === 1 && m100 !== 11) return "шаг"; if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "шага"; return "шагов"; }
 
   // ---------- Компоненты ----------
@@ -376,8 +401,8 @@ body.zooming { overflow: hidden; }
   function total(c) { return c.sections ? c.sections.reduce(function (a, s) { return a + s.items.length; }, 0) : c.items.length; }
 
   // Левая колонка: кнопки + нечётные; правая: чётные (как в макете)
-  function masonry(items, printLabel, imgs, track, prefix) {
-    var left = track ? ['<div class="progress-gap" aria-hidden="true"></div>'] : [], right = [];
+  function masonry(items, printLabel, imgs, track, prefix, lead) {
+    var left = lead ? [lead] : track ? ['<div class="progress-gap" aria-hidden="true"></div>'] : [], right = [];
     items.forEach(function (it, i) { (i % 2 === 0 ? right : left).push(card(it, imgs && imgs[i], track ? (prefix || "") + i + ":" + it[0] : false)); });
     return '<div class="masonry' + (track ? ' has-progress' : '') + '"><div class="col">' + left.join("") + '</div><div class="col">' + right.join("") + "</div></div>";
   }
@@ -398,20 +423,33 @@ body.zooming { overflow: hidden; }
       "</div></div>";
   }
 
+  // Хиро-картинка раздела вместо промо-текста (по комментарию: текст спорил с заголовком)
+  function catHero(c) {
+    var t = c.id === "origami" ? { i: IMG.home.hero, d: false } : (IMG.home[c.id] || { i: [] }), d = t.d ? 'darken' : '';
+    if (!t.i || !t.i[0]) return "";
+    return '<div class="hero cat-hero" role="img" aria-label="' + esc(c.name) + '">' + ph(t.i[0], 'cover', d, 'main') + '<div class="side">' + ph(t.i[1], 'cover', d) + ph(t.i[2], 'cover', d) + '</div></div>';
+  }
+  // Два варианта промо-описания раздела (оба живые, переключаются одной строкой):
+  //  "small" — 20px/500 как меню, в левой колонке над карточками (на месте бывшего трекера), кнопки→колонки 20px, текст→карточка 12px
+  //  "big"   — 40px промо-текст под кнопками на всю ширину (как было сначала)
+  var DESC_STYLE = "small";
+  function descLead(c) { return DESC_STYLE === "small" && c.desc ? '<div class="masonry-desc"><p class="desc desc-btn">' + richDesc(c.desc) + "</p></div>" : ""; }
   function intro(c) {
     return '<div class="intro"><div class="row-title"><h1 class="t t-52" style="margin:0;font-weight:400">' + esc(c.name) + '</h1><span class="t t-20">' + esc(c.count) + '</span></div>' + actions(total(c)) +
-      '<p class="desc">' + richDesc(c.desc) + "</p></div>";
+      (DESC_STYLE === "big" ? '<p class="desc">' + richDesc(c.desc) + "</p>" : "") + "</div>";
   }
 
   function prepSlider(slides) {
     var dots = slides.map(function (_, i) { return "<i" + (i === 0 ? ' class="on"' : "") + "></i>"; }).join("");
-    var s = slides.map(function (cap, i) {
-      var inner = ph(IMG.prep[i]);
+    var s = slides.map(function (sl) {
+      var cap = sl[0];
+      if (cap === "@title") return '<div class="slide slide-title">' + (sl[1] >= 0 ? ph(IMG.prep[sl[1]]) : "") + '<div class="title t">Как подготовить материалы</div></div>';
+      var inner = ph(IMG.prep[sl[1]]);
       if (cap === "@done") inner += '<div class="done t">Готово!</div>';
       else if (cap) inner += '<div class="cap">' + cap + "</div>";
       return '<div class="slide">' + inner + "</div>";
     }).join("");
-    return '<div class="stack gap-20"><span class="t t-20">Как подготовить материалы</span>' +
+    return '<div class="stack gap-20">' +
       '<div class="slider-wrap"><div class="dots" aria-hidden="true">' + dots + '</div><div class="slider" tabindex="0" aria-label="Шаги подготовки, листайте вбок">' + s + "</div></div></div>";
   }
 
@@ -419,10 +457,10 @@ body.zooming { overflow: hidden; }
     var body;
     if (c.sections) {
       body = c.sections.map(function (s, si) {
-        return '<section class="stack" style="gap:20px"><div class="sec-head"><h2 class="t section-title" style="margin:0;font-weight:400">' + esc(s.title) + "</h2></div>" + masonry(s.items, s.print, imgsFor(IMG.cards.games[si], s.items), true, si + "-") + "</section>";
+        return '<section class="stack" style="gap:20px"><div class="sec-head"><h2 class="t section-title" style="margin:0;font-weight:400">' + esc(s.title) + "</h2></div>" + masonry(s.items, s.print, imgsFor(IMG.cards.games[si], s.items), true, si + "-", descLead(s)) + "</section>";
       }).join("");
     } else {
-      body = (c.prep ? prepSlider(c.prep) : "") + masonry(c.items, c.print, imgsFor(IMG.cards[c.id], c.items), true);
+      body = (c.prep ? prepSlider(c.prep) : "") + masonry(c.items, c.print, imgsFor(IMG.cards[c.id], c.items), true, "", descLead(c));
     }
     return header(false) + '<div class="stack gap-40">' + menu(c.id) + intro(c) + body + '</div><div class="page-bottom"></div>';
   }
@@ -460,7 +498,8 @@ body.zooming { overflow: hidden; }
     document.title = (key === "home" ? "" : c.name + " — ") + "WB Дети";
     window.scrollTo(0, 0);
     wireSlider();
-    fitTitles();
+    fitTitles(); setTimeout(fitTitles, 250);
+    paintEdges();
     wireDone(key);
     wireOrigamiTag(key);
   }
@@ -579,6 +618,43 @@ body.zooming { overflow: hidden; }
 
 
   // Заголовок раздела в одну строку: уменьшаем ровно настолько, чтобы слово встало по ширине
+  // Картинка не по формату карточки (contain): фон карточки = средний цвет краёв картинки,
+  // чтобы пустое место вокруг неё выглядело продолжением картинки (в просмотре крупно цвет берётся оттуда же)
+  var EDGE = {};
+  // Средний цвет каждой стороны (полоса в 2px по краю): { top, bottom, left, right }
+  function edgeColor(img) {
+    var src = img.currentSrc || img.src; if (EDGE[src] !== undefined) return EDGE[src];
+    var res = null;
+    try {
+      var N = 48, cv = document.createElement("canvas"); cv.width = cv.height = N;
+      var g = cv.getContext("2d", { willReadFrequently: true }); g.drawImage(img, 0, 0, N, N);
+      var d = g.getImageData(0, 0, N, N).data;
+      function avg(x0, y0, x1, y1) {
+        var r = 0, gr = 0, b = 0, n = 0;
+        for (var y = y0; y < y1; y++) for (var x = x0; x < x1; x++) {
+          var i = (y * N + x) * 4; if (d[i + 3] < 128) continue;
+          r += d[i]; gr += d[i + 1]; b += d[i + 2]; n++;
+        }
+        return n ? "rgb(" + Math.round(r / n) + "," + Math.round(gr / n) + "," + Math.round(b / n) + ")" : null;
+      }
+      res = { top: avg(0, 0, N, 2), bottom: avg(0, N - 2, N, N), left: avg(0, 0, 2, N), right: avg(N - 2, 0, N, N) };
+    } catch (e) {}
+    return (EDGE[src] = res);
+  }
+  function paintEdges() {
+    app.querySelectorAll(".card .inner .pic.contain").forEach(function (img) {
+      var inner = img.closest(".inner");
+      function go() {
+        var e = edgeColor(img); if (!e) return;
+        // картинка шире карточки → пустота сверху/снизу, иначе — слева/справа; каждая сторона своим цветом
+        var wide = img.naturalWidth / img.naturalHeight > inner.clientWidth / inner.clientHeight;
+        var a = wide ? e.top : e.left, b = wide ? e.bottom : e.right; if (!a || !b) return;
+        inner.style.background = a === b ? a : "linear-gradient(" + (wide ? "to bottom" : "to right") + ", " + a + " 50%, " + b + " 50%)";
+      }
+      if (img.complete && img.naturalWidth) go(); else img.addEventListener("load", go, { once: true });
+    });
+  }
+
   function fitTitles() {
     app.querySelectorAll(".row-title").forEach(function (row) {
       var h = row.querySelector("h1"); if (!h) return;
@@ -588,9 +664,23 @@ body.zooming { overflow: hidden; }
       var w = h.scrollWidth;
       if (w > avail) h.style.fontSize = (Math.floor(52 * avail / w * 10) / 10) + "px";
     });
+    // Плитки главной: если название в две строки — сужаем его бокс по самой длинной строке, чтобы «N шт» встало сразу за первой строкой
+    app.querySelectorAll(".tile .label > :first-child").forEach(function (n) {
+      n.style.width = "";
+      var tn = n.firstChild; if (!tn || tn.nodeType !== 3) return;
+      var left = n.getBoundingClientRect().left, r = document.createRange(), right = 0, tops = {};
+      for (var i = 0; i < tn.length; i++) {
+        if (/\s/.test(tn.data[i])) continue; // пробел в конце строки не считаем
+        r.setStart(tn, i); r.setEnd(tn, i + 1); var b = r.getBoundingClientRect();
+        right = Math.max(right, b.right); tops[Math.round(b.top)] = 1;
+      }
+      if (Object.keys(tops).length > 1) n.style.width = Math.ceil(right - left) + "px";
+    });
   }
   window.addEventListener("resize", fitTitles);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitTitles);
+  if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", fitTitles);
+  window.addEventListener("load", fitTitles);
 
   function wireSlider() {
     var s = app.querySelector(".slider"); if (!s) return;
@@ -614,7 +704,7 @@ body.zooming { overflow: hidden; }
     var box = document.createElement("div"); box.className = "zoom-box"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true");
     var name = card.querySelector(".meta .t-16"); box.setAttribute("aria-label", name ? name.textContent : "Картинка");
     var img = new Image(); img.alt = name ? name.textContent : ""; img.src = pic.currentSrc || pic.src; img.style.objectFit = pic.classList.contains("contain") ? "contain" : "cover";
-    var bg = getComputedStyle(inner).backgroundColor; box.style.background = bg;
+    var bg = inner.style.background || getComputedStyle(inner).backgroundColor; box.style.background = bg;
     box.appendChild(img);
     var cap = document.createElement("div"); cap.className = "zoom-cap";
     var age = card.querySelector(".meta .chip");
@@ -643,19 +733,19 @@ body.zooming { overflow: hidden; }
     function place(r, radius) { box.style.left = r.left + "px"; box.style.top = r.top + "px"; box.style.width = r.width + "px"; box.style.height = r.height + "px"; box.style.borderRadius = radius + "px"; }
     function target(ratio) {
       // картинка + 16 + название (24) + 16 + кнопки (36), всё по центру экрана
-      var vw = innerWidth, vh = innerHeight, below = 16 + 30 + 16 + 36, maxW = vw - 32, maxH = vh - 32 - 56 - below;
+      var vw = innerWidth, vh = innerHeight, below = 24 + 24 + 12 + 36, /* картинка → инфо 24, строка инфо 24, инфо → кнопки 12, кнопки 36 */ maxW = vw - 32, maxH = vh - 32 - 56 - below;
       var w = maxW, h = w / ratio; if (h > maxH) { h = maxH; w = h * ratio; }
       return { left: (vw - w) / 2, top: Math.max(56, (vh - h - below) / 2), width: w, height: h };
     }
     var ratio = pic.naturalWidth && pic.naturalHeight ? pic.naturalWidth / pic.naturalHeight : from.width / from.height;
     var to = target(ratio);
-    cap.style.top = (to.top + to.height + 16) + "px";
+    cap.style.top = (to.top + to.height + 24) + "px";
     // низ тегов = базовая линия имени
     (function alignCap() {
       var bl = cap.querySelector(".bl"); if (!bl) return; var y = bl.getBoundingClientRect().top;
       void y;
     })();
-    btns.style.top = (to.top + to.height + 16 + 30 + 16) + "px";
+    btns.style.top = (to.top + to.height + 24 + 24 + 12) + "px";
     place(from, R);
     var lg = (pic.getAttribute("src") || "").replace("img/", "img/lg/");
     if (lg && lg !== img.src) { var hi = new Image(); hi.onload = function () { img.src = lg; }; hi.src = lg; }
