@@ -103,7 +103,8 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 .ph { position: relative; overflow: hidden; background: repeating-linear-gradient(135deg, var(--c-ph-1) 0 10px, var(--c-ph-2) 10px 20px); }
 .ph.has-img { background: none; }
 .pic { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block; pointer-events: none; }
-.pic.cover { object-fit: cover; } .pic.contain { object-fit: contain; }
+.pic.cover { object-fit: cover; object-position: center; } .pic.contain { object-fit: contain; object-position: center; }
+.card .inner .ph.has-img { background: transparent; }
 .darken { mix-blend-mode: darken; }
 .card .inner.r32 .pic { border-radius: 32px; }
 
