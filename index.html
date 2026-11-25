@@ -189,7 +189,14 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 .card .frame { background: var(--c-surface); border-radius: var(--r-card); }
 .card .inner { position: relative; border: 6px solid var(--c-surface); border-radius: 16px; overflow: hidden; height: 239px; background: var(--c-surface); }
 .card .inner .ph { height: 100%; }
-.card .icons { position: absolute; right: 7px; bottom: 8px; display: flex; gap: 4px; }
+.card .inner .card-slider { display: flex; height: 100%; width: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+.card .inner .card-slider::-webkit-scrollbar { display: none; }
+.card .inner .card-slide { flex: 0 0 100%; width: 100%; height: 100%; scroll-snap-align: start; position: relative; }
+.card .inner .card-slide .ph { height: 100%; }
+.card-dots { position: absolute; top: 10px; left: 10px; z-index: 2; display: flex; gap: 3px; pointer-events: none; }
+.card-dots i { display: block; width: 8px; height: 5px; border-radius: 6px; background: var(--c-accent-soft); transition: width .2s ease, background .2s ease; }
+.card-dots i.on { width: 28px; background: var(--c-accent); }
+.card .icons { position: absolute; right: 7px; bottom: 8px; z-index: 3; display: flex; gap: 4px; }
 .card .meta { display: flex; flex-direction: column; gap: 8px; padding: 4px 6px 0; }
 .chip { align-self: flex-start; display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: var(--r-chip); background: var(--c-surface); font-size: 16px; }
 .chip .t { line-height: 1; }
@@ -258,6 +265,12 @@ body.has-compact::before { content: ""; position: fixed; inset: 0 0 auto; height
 .zoom-box { position: fixed; z-index: 51; overflow: hidden; border-radius: 16px; background: var(--c-surface); box-shadow: 0 20px 60px rgba(0, 0, 0, 0); transition: box-shadow .38s ease; cursor: zoom-out; }
 .zoom-box.on { box-shadow: 0 20px 60px rgba(0, 0, 0, .18); }
 .zoom-box img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; max-width: none; }
+.zoom-slider { position: absolute; inset: 0; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+.zoom-slider::-webkit-scrollbar { display: none; }
+.zoom-slide { flex: 0 0 100%; height: 100%; position: relative; scroll-snap-align: start; }
+.zoom-dots { position: absolute; top: 16px; left: 16px; z-index: 2; display: flex; gap: 4px; pointer-events: none; }
+.zoom-dots i { display: block; width: 14px; height: 8px; border-radius: 10px; background: var(--c-accent-soft); transition: width .25s ease, background .25s ease; }
+.zoom-dots i.on { width: 60px; background: var(--c-accent); }
 .zoom-cap, .zoom-btns { position: fixed; z-index: 52; left: 0; right: 0; display: flex; justify-content: center; gap: 8px; align-items: center; opacity: 0; transform: translateY(8px); transition: opacity .3s ease .12s, transform .3s ease .12s; pointer-events: none; }
 .zoom-cap.on, .zoom-btns.on { opacity: 1; transform: none; }
 .zoom-cap { height: 24px; pointer-events: auto; padding: 0 16px; align-items: baseline; } /* текст в таблетке стоит на одной базовой линии с названием */
@@ -348,7 +361,7 @@ body.zooming { overflow: hidden; }
   };
 
   // ---------- Картинки из Figma (страница «for claude») ----------
-  var IMG = {"home":{"coloring":{"i":["img/tile-coloring-1.webp","img/tile-coloring-2.webp","img/tile-coloring-3.webp"],"d":false},"constructors":{"i":["img/tile-constructors-1.webp","img/tile-constructors-2.webp","img/tile-constructors-3.webp"],"d":false},"characters":{"i":["img/tile-characters-1.webp","img/tile-characters-2.webp","img/tile-characters-3.webp"],"d":true},"tasks":{"i":["img/tile-tasks-1.webp","img/tile-tasks-2.webp","img/tile-tasks-3.webp"],"d":true},"games":{"i":["img/tile-games-1.webp","img/tile-games-2.webp","img/tile-games-3.webp"],"d":true},"masks":{"i":["img/tile-masks-1.webp","img/tile-masks-2.webp","img/tile-masks-3.webp"],"d":false},"cards":{"i":["img/tile-cards-1.webp","img/tile-cards-2.webp","img/tile-cards-3.webp"],"d":false},"comics":{"i":["img/tile-comics-1.webp","img/tile-comics-2.webp","img/tile-comics-3.webp"],"d":true},"hero":["img/hero-main.webp","img/hero-top.webp","img/hero-bot.webp"]},"cards":{"origami":[{"n":"Ежик","s":"img/card-origami-64e4fddd.webp","f":"contain","b":"#fff","r":true},{"n":"Заяц","s":"img/card-origami-2bbf9cd3.webp","f":"cover","b":"#fff","r":true},{"n":"Лиса","s":"img/card-origami-7809c279.webp","f":"cover","b":"#fff","r":true},{"n":"Лягушка","s":"img/card-origami-84679466.webp","f":"cover","b":"#fff","r":true},{"n":"Журавлик","s":"img/card-origami-b151f41a.webp","f":"cover","b":"#fff","r":true}],"coloring":[{"n":"Персонажи","s":"img/card-coloring-f9055280.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Пенал","s":"img/card-coloring-287963c7.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Твой гардероб","s":"img/card-coloring-7855a99d.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 2","s":"img/card-coloring-36ddd7d3.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 4","s":"img/card-coloring-25144b3e.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 6","s":"img/card-coloring-b92e3c3a.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Декор цветы","s":"img/card-coloring-f6e54d80.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Мир WB","s":"img/card-coloring-a7fd75f6.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Школа","s":"img/card-coloring-58f2ece1.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Мешок для сменки","s":"img/card-coloring-f885f68d.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 1","s":"img/card-coloring-91a46f5b.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 3","s":"img/card-coloring-79bf0d03.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 5","s":"img/card-coloring-a28593a9.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Декор ПВЗ","s":"img/card-coloring-8b86a111.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Пвз рядом","s":"img/card-coloring-c966a077.webp","f":"cover","b":"#f0f0f0","r":false}],"constructors":[{"n":"Большая Ягодка","s":"img/card-constructors-ce16640c.webp","f":"cover","r":false},{"n":"Мини Ягодка","s":"img/card-constructors-4a4797d7.webp","f":"cover","r":false,"k":"constructor-mini-berry"},{"n":"Коробки WB","s":"img/card-constructors-54985759.webp","f":"cover","r":false},{"n":"Ягодка малина","s":"img/card-constructors-1e48f419.webp","f":"cover","r":false},{"n":"Ягодка черника","s":"img/card-constructors-58c64f42.webp","f":"cover","r":false}],"characters":[{"n":"Три поросенка","s":"img/card-characters-8be84198.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Монстр","s":"img/card-characters-9e2ee95a.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Дракон","s":"img/card-characters-30b822b9.webp","f":"contain","b":"#f0f0f0","r":false}],"tasks":[{"n":"Дом дракона","s":"img/card-tasks-4999b258.webp","f":"contain","b":"#fff","r":false},{"n":"Доставка","s":"img/card-tasks-11b38e71.webp","f":"contain","b":"#fff","r":false},{"n":"Персонажи","s":"img/card-tasks-65e67abc.webp","f":"contain","b":"#fff","r":false},{"n":"Сон девочки","s":"img/card-tasks-4e3f2632.webp","f":"contain","b":"#fff","r":false},{"n":"У пункта выдачи","s":"img/card-tasks-d4848aa5.webp","f":"contain","b":"#fff","r":false}],"cards":[{"n":"Дом дракона","s":"img/card-cards-0ab414c7.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Доставка","s":"img/card-cards-c21c1134.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Персонажи","s":"img/card-cards-22ecd83a.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Сон девочки","s":"img/card-cards-f016493c.webp","f":"contain","b":"#f0f0f0","r":false}],"comics":[{"n":"Подводный разговор","s":"img/card-comics-1d8066c8.webp","f":"contain","b":"#fff","r":false},{"n":"Сокровища","s":"img/card-comics-e1d66a56.webp","f":"contain","b":"#fff","r":false},{"n":"Ситуация","s":"img/card-comics-bbd47682.webp","f":"contain","b":"#fff","r":false}],"masks":[{"n":"Маски зверей","s":"img/card-masks-cca1077e.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Монстр","s":"img/card-masks-3d26e93a.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Единорог","s":"img/card-masks-4e498080.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Мышь","s":"img/card-masks-94198cc1.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Заяц 2","s":"img/card-masks-a53854c5.webp","f":"contain","b":"#fff","r":false},{"n":"Барсук","s":"img/card-masks-80f5c26a.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Разные очки","s":"img/card-masks-1451ab08.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Кот","s":"img/card-masks-bc67250c.webp","f":"contain","b":"#fff","r":false},{"n":"Заяц","s":"img/card-masks-0c53a534.webp","f":"contain","b":"#fff","r":false},{"n":"Лиса","s":"img/card-masks-1c0564ff.webp","f":"contain","b":"#fff","r":false}],"games":[[{"n":"Помоги девочке","s":"img/card-games-4365bd7f.webp","f":"contain","b":"#fff","r":false},{"n":"Найди замок","s":"img/card-games-4367e365.webp","f":"contain","b":"#fff","r":false},{"n":"Доставка","s":"img/card-games-30357fcc.webp","f":"contain","b":"#fff","r":false},{"n":"Яйцо","s":"img/card-games-b88f17a0.webp","f":"contain","b":"#fff","r":false},{"n":"Доставка","s":"img/card-games-8b05c77b.webp","f":"cover","b":"#fff","r":false}],[{"n":"Персонажи","s":"img/card-games-e1149ae0.webp","f":"cover","b":"#fff","r":false},{"n":"Дом дракона","s":"img/card-games-4f9ca04d.webp","f":"cover","b":"#fff","r":false},{"n":"Дом дракона","s":"img/card-games-4f9ca04d.webp","f":"cover","b":"#fff","r":false}],[{"n":"Дракон","s":"img/card-games-f2aae3a4.webp","f":"contain","b":"#fff","r":false},{"n":"Лиса","s":"img/card-games-5b2f0bbd.webp","f":"contain","b":"#fff","r":false},{"n":"Котик","s":"img/card-games-52fe64f8.webp","f":"contain","b":"#fff","r":false}],[{"n":"Морские обитатели","s":"img/card-games-16a4cefd.webp","f":"contain","b":"#fff","r":false},{"n":"Песчаный замок","s":"img/card-games-db209c6d.webp","f":"contain","b":"#fff","r":false}],[{"n":"Мир ПВЗ","s":"img/card-games-a457ac3d.webp","f":"contain","b":"#fff","r":false},{"n":"Сон девочки","s":"img/card-games-12fac7d5.webp","f":"contain","b":"#fff","r":false}]]},"prep":["img/prep-1.webp","img/prep-2.webp","img/prep-3.webp","img/prep-4.webp","img/prep-5.webp","img/prep-6.webp"],"steps":{"origami-fox":["img/step-fox-00.webp","img/step-fox-01.webp","img/step-fox-02.webp","img/step-fox-03.webp","img/step-fox-04.webp","img/step-fox-05.webp","img/step-fox-06.webp","img/step-fox-07.webp","img/step-fox-08.webp","img/step-fox-09.webp"],"origami-hedgehog":["img/step-hedgehog-00.webp","img/step-hedgehog-01.webp","img/step-hedgehog-02.webp","img/step-hedgehog-03.webp","img/step-hedgehog-04.webp","img/step-hedgehog-05.webp","img/step-hedgehog-06.webp","img/step-hedgehog-07.webp","img/step-hedgehog-08.webp","img/step-hedgehog-09.webp"],"origami-hare":["img/step-hare-00.webp","img/step-hare-01.webp","img/step-hare-02.webp","img/step-hare-03.webp","img/step-hare-04.webp","img/step-hare-05.webp","img/step-hare-06.webp","img/step-hare-07.webp","img/step-hare-08.webp","img/step-hare-09.webp","img/step-hare-10.webp","img/step-hare-11.webp","img/step-hare-12.webp","img/step-hare-13.webp"],"origami-frog":["img/step-frog-00.webp","img/step-frog-01.webp","img/step-frog-02.webp","img/step-frog-03.webp","img/step-frog-04.webp","img/step-frog-05.webp","img/step-frog-06.webp","img/step-frog-07.webp","img/step-frog-08.webp","img/step-frog-09.webp","img/step-frog-10.webp","img/step-frog-11.webp","img/step-frog-12.webp","img/step-frog-13.webp"],"origami-crane":["img/step-crane-00.webp","img/step-crane-01.webp","img/step-crane-02.webp","img/step-crane-03.webp","img/step-crane-04.webp","img/step-crane-05.webp","img/step-crane-06.webp","img/step-crane-07.webp","img/step-crane-08.webp","img/step-crane-09.webp","img/step-crane-10.webp","img/step-crane-11.webp","img/step-crane-12.webp","img/step-crane-13.webp","img/step-crane-14.webp","img/step-crane-15.webp","img/step-crane-16.webp"]}};
+  var IMG = {"home":{"coloring":{"i":["img/tile-coloring-1.webp","img/tile-coloring-2.webp","img/tile-coloring-3.webp"],"d":false},"constructors":{"i":["img/tile-constructors-1.webp","img/tile-constructors-2.webp","img/tile-constructors-3.webp"],"d":false},"characters":{"i":["img/tile-characters-1.webp","img/tile-characters-2.webp","img/tile-characters-3.webp"],"d":true},"tasks":{"i":["img/tile-tasks-1.webp","img/tile-tasks-2.webp","img/tile-tasks-3.webp"],"d":true},"games":{"i":["img/tile-games-1.webp","img/tile-games-2.webp","img/tile-games-3.webp"],"d":true},"masks":{"i":["img/tile-masks-1.webp","img/tile-masks-2.webp","img/tile-masks-3.webp"],"d":false},"cards":{"i":["img/tile-cards-1.webp","img/tile-cards-2.webp","img/tile-cards-3.webp"],"d":false},"comics":{"i":["img/tile-comics-1.webp","img/tile-comics-2.webp","img/tile-comics-3.webp"],"d":true},"hero":["img/hero-main.webp","img/hero-top.webp","img/hero-bot.webp"]},"cards":{"origami":[{"n":"Ежик","s":"img/card-origami-64e4fddd.webp","f":"contain","b":"#fff","r":true},{"n":"Заяц","s":"img/card-origami-2bbf9cd3.webp","f":"cover","b":"#fff","r":true},{"n":"Лиса","s":"img/card-origami-7809c279.webp","f":"cover","b":"#fff","r":true},{"n":"Лягушка","s":"img/card-origami-84679466.webp","f":"cover","b":"#fff","r":true},{"n":"Журавлик","s":"img/card-origami-b151f41a.webp","f":"cover","b":"#fff","r":true}],"coloring":[{"n":"Персонажи","s":"img/card-coloring-f9055280.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Пенал","s":"img/card-coloring-287963c7.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Твой гардероб","s":"img/card-coloring-7855a99d.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 2","s":"img/card-coloring-36ddd7d3.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 4","s":"img/card-coloring-25144b3e.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 6","s":"img/card-coloring-b92e3c3a.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Декор цветы","s":"img/card-coloring-f6e54d80.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Мир WB","s":"img/card-coloring-a7fd75f6.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Школа","s":"img/card-coloring-58f2ece1.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Мешок для сменки","s":"img/card-coloring-f885f68d.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 1","s":"img/card-coloring-91a46f5b.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 3","s":"img/card-coloring-79bf0d03.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Ягодка 5","s":"img/card-coloring-a28593a9.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Декор ПВЗ","s":"img/card-coloring-8b86a111.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Пвз рядом","s":"img/card-coloring-c966a077.webp","f":"cover","b":"#f0f0f0","r":false}],"constructors":[{"n":"Большая Ягодка","s":"img/card-constructors-ce16640c.webp","i":"img/sheet-constructors-ce16640c.webp","f":"cover","r":false},{"n":"Мини Ягодка","s":"img/card-constructors-4a4797d7.webp","i":"img/sheet-constructors-4a4797d7.webp","f":"cover","r":false,"k":"constructor-mini-berry"},{"n":"Коробки WB","s":"img/card-constructors-54985759.webp","i":"img/sheet-constructors-54985759.webp","f":"cover","r":false},{"n":"Ягодка малина","s":"img/card-constructors-1e48f419.webp","i":"img/sheet-constructors-1e48f419.webp","f":"cover","r":false},{"n":"Ягодка черника","s":"img/card-constructors-58c64f42.webp","i":"img/sheet-constructors-58c64f42.webp","f":"cover","r":false}],"characters":[{"n":"Три поросенка","s":"img/card-characters-8be84198.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Монстр","s":"img/card-characters-9e2ee95a.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Дракон","s":"img/card-characters-30b822b9.webp","f":"contain","b":"#f0f0f0","r":false}],"tasks":[{"n":"Дом дракона","s":"img/card-tasks-4999b258.webp","f":"contain","b":"#fff","r":false},{"n":"Доставка","s":"img/card-tasks-11b38e71.webp","f":"contain","b":"#fff","r":false},{"n":"Персонажи","s":"img/card-tasks-65e67abc.webp","f":"contain","b":"#fff","r":false},{"n":"Сон девочки","s":"img/card-tasks-4e3f2632.webp","f":"contain","b":"#fff","r":false},{"n":"У пункта выдачи","s":"img/card-tasks-d4848aa5.webp","f":"contain","b":"#fff","r":false}],"cards":[{"n":"Дом дракона","s":"img/card-cards-0ab414c7.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Доставка","s":"img/card-cards-c21c1134.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Персонажи","s":"img/card-cards-22ecd83a.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Сон девочки","s":"img/card-cards-f016493c.webp","f":"contain","b":"#f0f0f0","r":false}],"comics":[{"n":"Подводный разговор","s":"img/card-comics-1d8066c8.webp","f":"contain","b":"#fff","r":false},{"n":"Сокровища","s":"img/card-comics-e1d66a56.webp","f":"contain","b":"#fff","r":false},{"n":"Ситуация","s":"img/card-comics-bbd47682.webp","f":"contain","b":"#fff","r":false}],"masks":[{"n":"Маски зверей","s":"img/card-masks-cca1077e.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Монстр","s":"img/card-masks-3d26e93a.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Единорог","s":"img/card-masks-4e498080.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Мышь","s":"img/card-masks-94198cc1.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Заяц 2","s":"img/card-masks-a53854c5.webp","f":"contain","b":"#fff","r":false},{"n":"Барсук","s":"img/card-masks-80f5c26a.webp","f":"cover","b":"#f0f0f0","r":false},{"n":"Разные очки","s":"img/card-masks-1451ab08.webp","f":"contain","b":"#f0f0f0","r":false},{"n":"Кот","s":"img/card-masks-bc67250c.webp","f":"contain","b":"#fff","r":false},{"n":"Заяц","s":"img/card-masks-0c53a534.webp","f":"contain","b":"#fff","r":false},{"n":"Лиса","s":"img/card-masks-1c0564ff.webp","f":"contain","b":"#fff","r":false}],"games":[[{"n":"Помоги девочке","s":"img/card-games-4365bd7f.webp","f":"contain","b":"#fff","r":false},{"n":"Найди замок","s":"img/card-games-4367e365.webp","f":"contain","b":"#fff","r":false},{"n":"Доставка","s":"img/card-games-30357fcc.webp","f":"contain","b":"#fff","r":false},{"n":"Яйцо","s":"img/card-games-b88f17a0.webp","f":"contain","b":"#fff","r":false},{"n":"Доставка","s":"img/card-games-8b05c77b.webp","f":"cover","b":"#fff","r":false}],[{"n":"Персонажи","s":"img/card-games-e1149ae0.webp","f":"cover","b":"#fff","r":false},{"n":"Дом дракона","s":"img/card-games-4f9ca04d.webp","f":"cover","b":"#fff","r":false},{"n":"Дом дракона","s":"img/card-games-4f9ca04d.webp","f":"cover","b":"#fff","r":false}],[{"n":"Дракон","s":"img/card-games-f2aae3a4.webp","f":"contain","b":"#fff","r":false},{"n":"Лиса","s":"img/card-games-5b2f0bbd.webp","f":"contain","b":"#fff","r":false},{"n":"Котик","s":"img/card-games-52fe64f8.webp","f":"contain","b":"#fff","r":false}],[{"n":"Морские обитатели","s":"img/card-games-16a4cefd.webp","f":"contain","b":"#fff","r":false},{"n":"Песчаный замок","s":"img/card-games-db209c6d.webp","f":"contain","b":"#fff","r":false}],[{"n":"Мир ПВЗ","s":"img/card-games-a457ac3d.webp","f":"contain","b":"#fff","r":false},{"n":"Сон девочки","s":"img/card-games-12fac7d5.webp","f":"contain","b":"#fff","r":false}]]},"prep":["img/prep-1.webp","img/prep-2.webp","img/prep-3.webp","img/prep-4.webp","img/prep-5.webp","img/prep-6.webp"],"steps":{"origami-fox":["img/step-fox-00.webp","img/step-fox-01.webp","img/step-fox-02.webp","img/step-fox-03.webp","img/step-fox-04.webp","img/step-fox-05.webp","img/step-fox-06.webp","img/step-fox-07.webp","img/step-fox-08.webp","img/step-fox-09.webp"],"origami-hedgehog":["img/step-hedgehog-00.webp","img/step-hedgehog-01.webp","img/step-hedgehog-02.webp","img/step-hedgehog-03.webp","img/step-hedgehog-04.webp","img/step-hedgehog-05.webp","img/step-hedgehog-06.webp","img/step-hedgehog-07.webp","img/step-hedgehog-08.webp","img/step-hedgehog-09.webp"],"origami-hare":["img/step-hare-00.webp","img/step-hare-01.webp","img/step-hare-02.webp","img/step-hare-03.webp","img/step-hare-04.webp","img/step-hare-05.webp","img/step-hare-06.webp","img/step-hare-07.webp","img/step-hare-08.webp","img/step-hare-09.webp","img/step-hare-10.webp","img/step-hare-11.webp","img/step-hare-12.webp","img/step-hare-13.webp"],"origami-frog":["img/step-frog-00.webp","img/step-frog-01.webp","img/step-frog-02.webp","img/step-frog-03.webp","img/step-frog-04.webp","img/step-frog-05.webp","img/step-frog-06.webp","img/step-frog-07.webp","img/step-frog-08.webp","img/step-frog-09.webp","img/step-frog-10.webp","img/step-frog-11.webp","img/step-frog-12.webp","img/step-frog-13.webp"],"origami-crane":["img/step-crane-00.webp","img/step-crane-01.webp","img/step-crane-02.webp","img/step-crane-03.webp","img/step-crane-04.webp","img/step-crane-05.webp","img/step-crane-06.webp","img/step-crane-07.webp","img/step-crane-08.webp","img/step-crane-09.webp","img/step-crane-10.webp","img/step-crane-11.webp","img/step-crane-12.webp","img/step-crane-13.webp","img/step-crane-14.webp","img/step-crane-15.webp","img/step-crane-16.webp"]}};
   function pic(src, fit, cls) { return src ? '<img class="pic ' + (fit || 'cover') + (cls ? ' ' + cls : '') + '" src="' + src + '" alt="" loading="lazy" decoding="async">' : ''; }
   function ph(src, fit, cls, extra) { return '<div class="' + (extra ? extra + ' ' : '') + 'ph' + (src ? ' has-img' : '') + '">' + pic(src, fit, cls) + '</div>'; }
   // Сопоставление по названию (дубли — по порядку)
@@ -387,10 +400,12 @@ body.zooming { overflow: hidden; }
 
   function card(item, im, track) {
     var tag = item[2] ? "a" : "div";
-    var extra = '';
     var href = item[2] ? ' href="#' + item[2] + '"' : "";
     var fileAttr = (im && im.k) ? ' data-file="' + esc(im.k) + '"' : "";
-    return "<" + tag + ' class="card"' + (track ? ' data-key="' + esc(track) + '"' : '') + fileAttr + href + '><div class="frame"><div class="inner' + (im && im.r ? ' r32' : '') + '"' + (im && im.b ? ' style="background:' + im.b + '"' : '') + '>' + ph(im && im.s, im && im.f) + extra + iconButtons() + '</div></div>' +
+    var media = (im && im.i)
+      ? '<div class="card-slider" tabindex="0" aria-label="Превью и инструкция, листайте"><div class="card-slide">' + ph(im.s, im.f) + '</div><div class="card-slide">' + ph(im.i, "contain") + '</div></div><div class="card-dots" aria-hidden="true"><i class="on"></i><i></i></div>'
+      : ph(im && im.s, im && im.f);
+    return "<" + tag + ' class="card"' + (track ? ' data-key="' + esc(track) + '"' : '') + fileAttr + href + '><div class="frame"><div class="inner' + (im && im.r ? ' r32' : '') + '"' + (im && im.b ? ' style="background:' + im.b + '"' : '') + '>' + media + iconButtons() + '</div></div>' +
       '<div class="meta"><span class="t t-16">' + esc(item[0]) + '</span><span class="chip"><span class="t">' + esc(item[1]) + '</span></span>' + '</div></' + tag + ">";
   }
 
@@ -500,6 +515,7 @@ body.zooming { overflow: hidden; }
     document.title = (key === "home" ? "" : c.name + " — ") + "WB Дети";
     window.scrollTo(0, 0);
     wireSlider();
+    wireCardSliders();
     fitTitles(); setTimeout(fitTitles, 250);
     paintEdges();
     wireDone(key);
@@ -693,30 +709,71 @@ body.zooming { overflow: hidden; }
       dots.forEach(function (d, k) { d.classList.toggle("on", k === i); });
     }, { passive: true });
   }
+  function wireCardSliders() {
+    app.querySelectorAll(".card-slider").forEach(function (s) {
+      var dots = s.parentElement.querySelectorAll(".card-dots i");
+      if (!dots.length) return;
+      s.addEventListener("scroll", function () {
+        var i = Math.min(dots.length - 1, Math.round(s.scrollLeft / Math.max(1, s.clientWidth)));
+        dots.forEach(function (d, k) { d.classList.toggle("on", k === i); });
+      }, { passive: true });
+    });
+  }
 
   // ---------- Просмотр карточки крупно (FLIP-анимация из карточки на весь экран) ----------
   var zoom = null;
   function openZoom(card) {
     if (zoom) return;
-    var inner = card.querySelector(".inner"), pic = inner && inner.querySelector(".pic"); if (!pic) return;
-    var slot = pic.parentElement, R = 10; // область картинки внутри белой рамки карточки
+    var inner = card.querySelector(".inner"); if (!inner) return;
+    var slider = inner.querySelector(".card-slider");
+    var pics = slider ? Array.prototype.slice.call(slider.querySelectorAll(".pic")) : [inner.querySelector(".pic")].filter(Boolean);
+    if (!pics.length) return;
+    var active = 0;
+    if (slider) active = Math.min(pics.length - 1, Math.round(slider.scrollLeft / Math.max(1, slider.clientWidth)));
+    var pic = pics[active];
+    var slot = slider || pic.parentElement, R = 10; // область картинки внутри белой рамки карточки
     var from = slot.getBoundingClientRect();
     var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
     var ov = document.createElement("div"); ov.className = "zoom-overlay";
     var box = document.createElement("div"); box.className = "zoom-box"; box.setAttribute("role", "dialog"); box.setAttribute("aria-modal", "true");
     var name = card.querySelector(".meta .t-16"); box.setAttribute("aria-label", name ? name.textContent : "Картинка");
-    var img = new Image(); img.alt = name ? name.textContent : ""; img.src = pic.currentSrc || pic.src; img.style.objectFit = pic.classList.contains("contain") ? "contain" : "cover";
     var bg = inner.style.background || getComputedStyle(inner).backgroundColor; box.style.background = bg;
-    box.appendChild(img);
+    var img = null, zslider = null;
+    function loadLg(el, src) {
+      var lg = (src || "").replace("img/", "img/lg/");
+      if (lg && lg !== el.src) { var hi = new Image(); hi.onload = function () { el.src = lg; }; hi.src = lg; }
+    }
+    if (pics.length > 1) {
+      zslider = document.createElement("div"); zslider.className = "zoom-slider"; zslider.setAttribute("aria-label", "Превью и инструкция, листайте");
+      pics.forEach(function (p, i) {
+        var slide = document.createElement("div"); slide.className = "zoom-slide";
+        var el = new Image(); el.alt = name ? name.textContent : ""; el.src = p.currentSrc || p.src;
+        el.style.objectFit = p.classList.contains("contain") ? "contain" : "cover";
+        loadLg(el, p.getAttribute("src") || "");
+        if (i === active) img = el;
+        slide.appendChild(el); zslider.appendChild(slide);
+      });
+      if (!img) img = zslider.querySelector("img");
+      var zdots = document.createElement("div"); zdots.className = "zoom-dots"; zdots.setAttribute("aria-hidden", "true");
+      zdots.innerHTML = pics.map(function (_, i) { return "<i" + (i === active ? ' class="on"' : "") + "></i>"; }).join("");
+      box.appendChild(zslider); box.appendChild(zdots);
+      zslider.addEventListener("scroll", function () {
+        var i = Math.min(pics.length - 1, Math.round(zslider.scrollLeft / Math.max(1, zslider.clientWidth)));
+        Array.prototype.forEach.call(zdots.children, function (d, k) { d.classList.toggle("on", k === i); });
+      }, { passive: true });
+    } else {
+      img = new Image(); img.alt = name ? name.textContent : ""; img.src = pic.currentSrc || pic.src;
+      img.style.objectFit = pic.classList.contains("contain") ? "contain" : "cover";
+      box.appendChild(img);
+      loadLg(img, pic.getAttribute("src") || "");
+    }
     var cap = document.createElement("div"); cap.className = "zoom-cap";
     var age = card.querySelector(".meta .chip");
-    var trackedZ = card.hasAttribute("data-key");
     cap.innerHTML = '<span class="t zoom-name">' + (name ? esc(name.textContent) : "") + '<i class="bl" style="display:inline-block;width:0;height:0;vertical-align:baseline"></i></span>' + (age ? age.outerHTML : "") ;
     var btns = document.createElement("div"); btns.className = "zoom-btns";
     var tracked = card.hasAttribute("data-key");
     btns.__card = card;
-    btns.innerHTML = '<button class="ic" type="button" aria-label="Скачать">' + ICON.download() + '</button><button class="ic" type="button" aria-label="Распечатать">' + ICON.print() + '</button>' +
-      '';
+    btns.innerHTML = '<button class="ic" type="button" aria-label="Скачать">' + ICON.download() + '</button><button class="ic" type="button" aria-label="Распечатать">' + ICON.print() + '</button>';
     var zdone = btns.querySelector(".zoom-done");
     function zpaint() { if (zdone) { var on = isDone(card); zdone.classList.toggle("on", on); zdone.setAttribute("aria-pressed", on ? "true" : "false"); zdone.setAttribute("aria-label", on ? "Сделано. Снять отметку" : "Отметить сделанной"); } }
     zpaint();
@@ -725,9 +782,7 @@ body.zooming { overflow: hidden; }
       if (b === zdone) setDone(card, !isDone(card), b); else addPending(DONE.key, card.getAttribute("data-key"));
       zpaint();
     });
-    cap.addEventListener("click", function (e) {
-      e.stopPropagation();
-    });
+    cap.addEventListener("click", function (e) { e.stopPropagation(); });
     var close = document.createElement("button"); close.className = "zoom-close"; close.type = "button"; close.setAttribute("aria-label", "Закрыть");
     close.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1L13 13M13 1L1 13" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg>';
     [ov, box, cap, btns, close].forEach(function (el) { document.body.appendChild(el); });
@@ -742,36 +797,40 @@ body.zooming { overflow: hidden; }
     var ratio = pic.naturalWidth && pic.naturalHeight ? pic.naturalWidth / pic.naturalHeight : from.width / from.height;
     var to = target(ratio);
     cap.style.top = (to.top + to.height + 24) + "px";
-    // низ тегов = базовая линия имени
-    (function alignCap() {
-      var bl = cap.querySelector(".bl"); if (!bl) return; var y = bl.getBoundingClientRect().top;
-      void y;
-    })();
     btns.style.top = (to.top + to.height + 24 + 24 + 12) + "px";
     place(from, R);
-    var lg = (pic.getAttribute("src") || "").replace("img/", "img/lg/");
-    if (lg && lg !== img.src) { var hi = new Image(); hi.onload = function () { img.src = lg; }; hi.src = lg; }
     var anim = null, frames = function (a, b, ra, rb) { return [{ left: a.left + "px", top: a.top + "px", width: a.width + "px", height: a.height + "px", borderRadius: ra + "px" }, { left: b.left + "px", top: b.top + "px", width: b.width + "px", height: b.height + "px", borderRadius: rb + "px" }]; };
     requestAnimationFrame(function () {
+      if (zslider) zslider.scrollLeft = active * Math.max(1, zslider.clientWidth);
       ov.classList.add("on"); box.classList.add("on"); cap.classList.add("on"); btns.classList.add("on"); close.classList.add("on");
       if (!reduce && box.animate) anim = box.animate(frames(from, to, R, 24), { duration: 420, easing: "cubic-bezier(.2,.8,.2,1)", fill: "forwards" });
       place(to, 24);
     });
-    pic.style.visibility = "hidden"; // прячем только саму картинку — название, тег и кнопки карточки остаются на месте
+    if (slider) slider.style.visibility = "hidden"; else pic.style.visibility = "hidden"; // прячем картинку — мета карточки остаётся
     function onKey(e) { if (e.key === "Escape") shut(); }
     function shut() {
       if (!zoom) return; zoom = null;
       document.removeEventListener("keydown", onKey);
       var back = slot.getBoundingClientRect(), cur = box.getBoundingClientRect();
-      if (card.classList.contains("is-done")) { img.style.transition = "filter .34s ease, opacity .34s ease"; img.style.filter = "grayscale(1)"; img.style.opacity = ".5"; }
+      if (card.classList.contains("is-done") && img) { img.style.transition = "filter .34s ease, opacity .34s ease"; img.style.filter = "grayscale(1)"; img.style.opacity = ".5"; }
       ov.classList.remove("on"); box.classList.remove("on"); cap.classList.remove("on"); btns.classList.remove("on"); close.classList.remove("on");
-      function done() { [ov, box, cap, btns, close].forEach(function (el) { el.remove(); }); pic.style.visibility = ""; document.body.classList.remove("zooming"); }
+      function done() {
+        [ov, box, cap, btns, close].forEach(function (el) { el.remove(); });
+        if (slider) slider.style.visibility = ""; else pic.style.visibility = "";
+        document.body.classList.remove("zooming");
+      }
       if (anim) anim.cancel();
       place(back, R);
       if (!reduce && box.animate) box.animate(frames(cur, back, 24, R), { duration: 340, easing: "cubic-bezier(.4,0,.2,1)" }).onfinish = done; else done();
     }
     zoom = { shut: shut };
-    [ov, box, close].forEach(function (el) { el.addEventListener("click", shut); });
+    // клик по оверлею/крестику закрывает; по слайдеру — листает (не закрываем)
+    ov.addEventListener("click", shut);
+    close.addEventListener("click", shut);
+    box.addEventListener("click", function (e) {
+      if (zslider && e.target.closest(".zoom-slider")) return;
+      shut();
+    });
     document.addEventListener("keydown", onKey);
   }
   app.addEventListener("click", function (e) {
@@ -815,7 +874,7 @@ body.zooming { overflow: hidden; }
     return fs.every(Boolean) ? fs : null;
   }
   function baseOf(src) { var m = (src || "").match(/([^\/]+)\.webp$/); return m ? m[1] : ""; }
-  function bigSrc(src) { return /img\/card-/.test(src) ? src.replace("img/", "img/lg/") : src; }
+  function bigSrc(src) { return /img\/(card-|sheet-)/.test(src) ? src.replace("img/", "img/lg/") : src; }
   function safeName(s) { return (s || "WB Дети").replace(/[\\\/:*?"<>|]+/g, " ").trim(); }
   function capText(s) { return (s || "").replace(/<br\s*\/?>/gi, " ").replace(/\s+/g, " ").trim(); }
 
